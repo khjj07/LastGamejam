@@ -1,0 +1,20 @@
+local DefUI= require "DefUtil.DefUI.DefUI"
+local UI = require "game.ui.title"
+local PROXY = msg.url("main:/scene_proxy")
+
+function start(self)
+	msg.post(PROXY, "change_scene",{next="#ingame"})
+	print(1)
+end
+
+function init(self)
+	DefUI.init(self)
+	UI.init(self)
+	DefUI.create_button(self, "start", self.box_node["start_btn"], {pressed = start})
+	msg.post(".", "acquire_input_focus")
+end
+
+
+function on_input(self, action_id, action)
+	DefUI.on_input(self, action_id, action)
+end
