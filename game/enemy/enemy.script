@@ -9,20 +9,20 @@ local ANIMATION ={
 	idle=hash("idle"),
 	walk=hash("walk"),
 }
-local HP_STATE={
-	MAX=hash("max"),
-	MIDDLE=hash("middle"),
-	LOW=hash("low")
+local HP_COLOR={
+	RED=vmath.vector4(1,0,0,1),
+	ORANGE=vmath.vector4(1,0.7,0,1),
+	GREEN=vmath.vector4(0,1,0,1)
 }
 local MIN_WAITING=1
 local MAX_WAITING=6
 local RAY_DISTANCE=30
-local START_LINE=-400
+local MANAGER=msg.url("default:/manager")
 
 go.property("seed", 1)
 go.property("speed", 50)
 go.property("hp", 5)
-go.property("hp_decrease_delay", 1)
+go.property("hp_decrease_delay", 0.1)
 go.property("maxhp", 10)
 go.property("initial_direction", vmath.vector3(1,0,0))
 go.property("direction", vmath.vector3(1,0,0))
@@ -50,24 +50,16 @@ local function check_forward(self)
 	end
 	return result
 end
+
 function update_hp(self)
 	go.set("#hp", "scale.x", self.hp/self.maxhp)
-end
-
-local function check_start_line(self)
-	if go.get_position().x>START_LINE then
-		self.state=STATE.waiting
-		timer.delay(self.hp_decrease_delay, true, function()
-			check_state(self)
-			if self.state == STATE.patrol or self.state == STATE.wait then
-				self.hp=self.hp-1
-				update_hp(self)
-			end
-			--print(self.hp)
-		end)
-		state_timer(self)
-		timer.cancel(self.start_handler)
-	end	
+	if self.hp/self.maxhp <= 0.1 then
+		go.set("#hp","tint",HP_COLOR.RED)
+	elseif self.hp/self.maxhp <= 0.5 then
+		go.set("#hp","tint",HP_COLOR.ORANGE)
+	else
+		go.set("#hp","tint",HP_COLOR.GREEN)
+	end 
 end
 
 function coming(self)
@@ -88,10 +80,22 @@ function patrol(self)
 end
 
 function check_state(self)
-	if self.hp/self.maxhp==1 then
+	if self.hp/self.maxhp>=1 then
 		self.state = STATE.returning
-	elseif self.hp/self.maxhp==0 then
+		if not self.returning then
+			msg.post(MANAGER, "return",{id=go.get_id()})
+			self.current_animation=ANIMATION.idle
+			self.returning=true
+		end
+		self.hp=self.maxhp
+	elseif self.hp/self.maxhp<=0 then
 		self.state = STATE.coming
+		if not self.come then
+			self.current_animation=ANIMATION.idle
+			msg.post(MANAGER, "come",{id=go.get_id()})
+			self.come=true
+		end
+		self.hp=0
 	end
 end
 
@@ -128,14 +132,13 @@ function init(self)
 	self.state=STATE.coming
 	self.vel=vmath.vector3()
 	self.tag={self.tag1,self.tag2,self.tag3}
-	self.current_animation=hash("idle")
+	self.current_animation=ANIMATION.idle
 	self.sprite="#sprite"
+	self.come=false
+	self.returning=false
 	if self.fliped_sprite then
 		msg.post("#flip_sprite", "disable")
 	end
-	self.start_handler=timer.delay(0.1, true, function()
-		check_start_line(self)
-	end)
 	go.set_scale(self.custom_scale)
 	update_hp(self)
 end
@@ -160,11 +163,41 @@ function on_message(self, message_id, message, sender)
 		timer.cancel(self.state_timer)
 		state_timer(self)
 	end
+	if message_id==hash("trigger_response") then
+		if message.other_group == hash("deadline") and message.enter then
+			msg.post(MANAGER, "dead",{id=go.get_id()})
+		end
+		if message.other_group == hash("startline") and not message.enter then
+			self.state=STATE.waiting
+			timer.delay(self.hp_decrease_delay, true, function()
+				check_state(self)
+				if self.state == STATE.patrol or self.state == STATE.waiting then
+					self.hp=self.hp-0.3
+					update_hp(self)
+				end
+				--print(self.hp)
+			end)
+			state_timer(self)
+		end
+	end
+	if message_id==hash("match") then
+		for i=1,#self.tag do
+			if self.tag[i]==message.tag then
+				print("match : "..tostring(message.tag))
+				self.hp=self.hp+message.damage
+				print(self.hp)
+				if self.hp>=self.maxhp then
+					self.hp=self.maxhp
+				end
+				update_hp(self)
+				break
+			end
+		end
+	end
 end
 
 function update(self,dt)
 	Layering.update(self, dt)
-	flip_animation(self)
 	if self.state == STATE.coming then
 		coming(self)
 	elseif self.state == STATE.returning then
@@ -172,19 +205,7 @@ function update(self,dt)
 	else
 		patrol(self)
 	end
-	--if not self.state == STATE.waiting then
-		local pos = go.get_position()+self.vel*dt
-		go.set_position(pos)
-	--end
-end
-
-function on_message(self, message_id, message, sender)
-	if message_id==hash("match") then
-		for i=1,#self.tag do
-			if self.tag[i]==message.tag then
-				self.hp=self.hp+message.damage
-				break
-			end
-		end
-	end
+	local pos = go.get_position()+self.vel*dt
+	go.set_position(pos)
+	flip_animation(self)
 end

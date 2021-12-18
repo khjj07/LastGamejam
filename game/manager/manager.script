@@ -1,0 +1,28 @@
+function init(self)
+	self.coming_enemy={}
+	print(msg.url())
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id==hash("match") then
+		for k, enemy in pairs(self.coming_enemy) do
+			msg.post(enemy,"match",{tag=message.tag,damage=message.damage})
+		end
+		print(message.tag)
+	end
+	if message_id==hash("dead") then
+		for k, enemy in pairs(self.coming_enemy) do
+			if enemy == message.id then
+				table.remove(self.coming_enemy,k)
+			end
+		end
+		go.delete(message.id)
+	end	
+	if message_id==hash("come") then
+		table.insert(self.coming_enemy, message.id)
+		print(message.id)
+	end	
+	if message_id==hash("return") then
+		table.insert(self.coming_enemy, message.id)
+	end	
+end

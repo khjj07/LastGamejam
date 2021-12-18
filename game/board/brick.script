@@ -1,10 +1,11 @@
 go.property("color", hash("yellow"))
-go.property("type", hash("plain"))
+go.property("type", hash(""))
 
 local emthree = require "emthree.emthree"
 
 function init(self)
 	msg.post("#sprite", "play_animation", { id = self.color })
+	self.damage=10
 end
 
 function on_message(self, message_id, message, sender)

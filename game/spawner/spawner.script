@@ -1,6 +1,7 @@
 local rendercam=require "rendercam.rendercam"
 local SPAWN_HEIGHT=200
-go.property("spawn_delay", 2)
+go.property("decrease_delay", 120)
+go.property("spawn_delay", 5)
 
 
 function init(self)
@@ -9,4 +10,19 @@ function init(self)
 	self.spawn_handler = timer.delay(self.spawn_delay, true, function()
 		factory.create("#enemy"..tostring(math.random(1,14)),go.get_position()+vmath.vector3(0,math.random(-SPAWN_HEIGHT,SPAWN_HEIGHT),0),nil,{type=self.current_type,seed=math.random(1,1000)})
 	end)
+	timer.delay(self.decrease_delay, true, function()
+		if self.spawn_delay>1 then
+			self.spawn_delay=self.spawn_delay-1
+			msg.post(".", "recall_spawn_timer")
+		end
+	end)
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id==hash("recall_spawn_timer") then
+		timer.cancel(self.spawn_handler)
+		self.spawn_handler = timer.delay(self.spawn_delay, true, function()
+			factory.create("#enemy"..tostring(math.random(1,14)),go.get_position()+vmath.vector3(0,math.random(-SPAWN_HEIGHT,SPAWN_HEIGHT),0),nil,{type=self.current_type,seed=math.random(1,1000)})
+		end)
+	end
 end

@@ -4,7 +4,15 @@ local rendercam = require "rendercam.rendercam"
 local blocksize = 50		-- Distance between block centers
 local boardwidth = 6		-- Number of columns
 local boardheight = 10		-- Number of rows
-
+local MANAGER=msg.url("default:/manager")
+local TAG ={
+	hash("shield"),
+	hash("staff"),
+	hash("sword"),
+	hash("monster"),
+	hash("skeleton"),
+	hash("human"),
+}
 local colors = {
 	hash("Icon_Shield"),
 	hash("Icon_Staff"),
@@ -35,35 +43,28 @@ function stop_shake(id)
 end
 
 local function match(board, block, horisontal_neighbors, vertical_neighbors)
-	if #horisontal_neighbors >= 2 and #vertical_neighbors >= 2 then
-		emthree.remove_blocks(board, horisontal_neighbors)
-		emthree.remove_blocks(board, vertical_neighbors)
-		--emthree.change_block(block, block_type.WRAPPED, block.color)
-	elseif #horisontal_neighbors >= 4 then
-		emthree.remove_blocks(board, horisontal_neighbors)
-		--emthree.change_block(block, block_type.BOMB, nil)
-	elseif #horisontal_neighbors == 3 then
-		emthree.remove_blocks(board, horisontal_neighbors)
-		--emthree.change_block(block, block_type.STRIPED_V, block.color)
-	elseif #horisontal_neighbors == 2 then
+	if #horisontal_neighbors >= 2 then
 		emthree.remove_block(board, block)
 		emthree.remove_blocks(board, horisontal_neighbors)
-	elseif #vertical_neighbors >= 4 then
-		emthree.remove_blocks(board, vertical_neighbors)
-		--emthree.change_block(block, block_type.BOMB, nil)
-	elseif #vertical_neighbors == 3 then
-		emthree.remove_blocks(board, vertical_neighbors)
-		--emthree.change_block(block, block_type.STRIPED_H, block.color)
-	elseif #vertical_neighbors == 2 then
+	end
+	if #vertical_neighbors >= 2 then
 		emthree.remove_block(board, block)
 		emthree.remove_blocks(board, vertical_neighbors)
 	end
-	
+	if #vertical_neighbors+ #horisontal_neighbors == 2 then
+		msg.post(MANAGER,"match",{tag=block.type,damage=10})
+	elseif #vertical_neighbors+ #horisontal_neighbors == 3 then
+		msg.post(MANAGER,"match",{tag=block.type,damage=15})
+	elseif #vertical_neighbors+ #horisontal_neighbors >= 4 then
+		msg.post(MANAGER,"match",{tag=block.type,damage=40})
+	end
 end
 
 local function create_block(position, type, color)
 	if not type and not color then
-		color = color or colors[math.random(#colors)]
+		local num = math.random(#colors)
+		color = color or colors[num]
+		type = type or TAG[num]
 	end
 	local id = factory.create("#factory", position, null, { color = color, type = type })
 	msg.post(id, "set_parent", { parent_id = go.get_id(), keep_world_transform = 0 })
