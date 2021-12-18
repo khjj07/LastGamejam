@@ -11,7 +11,6 @@ end
 function on_message(self, message_id, message, sender)
 	if message_id == emthree.REMOVE then
 		particlefx.play("#match")
-		--factory.create("#blob",go.get_position(),nil,{goal=})
 		go.animate(".", "scale", go.PLAYBACK_LOOP_PINGPONG, vmath.vector3(2,2,1), go.EASING_INBOUNCE, 0.3)
 		go.animate(".", "rotation", go.PLAYBACK_LOOP_PINGPONG, vmath.quat_rotation_z(math.pi/180*10), go.EASING_LINEAR, 0.2)
 		timer.delay(0.25, false, function()

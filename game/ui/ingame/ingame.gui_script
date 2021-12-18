@@ -1,6 +1,6 @@
 local DefUI= require "DefUtil.DefUI.DefUI"
 local UI = require "game.ui.ingame.ingame"
-local MAX = 20
+local MAX = 15
 local MAX_SIZE=400
 
 

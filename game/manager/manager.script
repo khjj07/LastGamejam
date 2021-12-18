@@ -1,6 +1,6 @@
 local INGAME_UI = "default:/ingame"
-local MAX_FEVER = 20
-local FEVER_TIME = 10
+local MAX_FEVER = 15
+local FEVER_TIME = 15
 local BGM={
 	"#ingame_bgm1",
 	"#ingame_bgm2",
