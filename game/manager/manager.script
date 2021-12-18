@@ -1,11 +1,39 @@
 local INGAME_UI = "default:/ingame"
 local MAX_FEVER = 20
 local FEVER_TIME = 10
+local BGM={
+	"#ingame_bgm1",
+	"#ingame_bgm2",
+	"#ingame_bgm3",
+}
+local BGM_PLAY_TIME={
+	168,
+	257,
+	192
+}
+function play_next_music(self)
+	self.music_flag=self.music_flag+1
+	if self.music_flag>3 then
+		self.music_flag=1
+	end
+	self.current_music=BGM[self.music_flag]
+	sound.play(self.current_music)
+	self.time_saver=0
+	self.time_save_routine = timer.delay(1, true, function()
+		self.time_saver=self.time_saver+1
+	end)
+	self.bgm_timer=timer.delay(BGM_PLAY_TIME[self.music_flag], false, function()
+		play_next_music(self)
+	end)
+end
+
 function init(self)
 	self.coming_enemy={}
 	self.life=3
 	self.fever=0
-	print(msg.url())
+	self.time_saver=0
+	self.music_flag = math.random(#BGM)
+	play_next_music(self)
 end
 
 function update(self,dt)
@@ -24,6 +52,11 @@ function on_message(self, message_id, message, sender)
 	if message_id==hash("fever_end") then
 		timer.cancel(self.fever_time)
 		self.fever_time=nil
+		sound.stop("#fever_bgm")
+		sound.pause(self.current_music,false)
+		self.bgm_timer=timer.delay(BGM_PLAY_TIME[self.music_flag]-self.time_saver, false, function()
+			play_next_music(self)
+		end)
 	end
 	if message_id==hash("fever_time") then
 		self.fever_time=timer.delay(0.1, true, function()
@@ -33,6 +66,7 @@ function on_message(self, message_id, message, sender)
 				self.fever=0
 				msg.post(".", "fever_end")
 			end
+			
 			msg.post(INGAME_UI, "update_fever",{value=self.fever})
 		end)
 	end	
@@ -40,6 +74,10 @@ function on_message(self, message_id, message, sender)
 		self.fever=self.fever+message.value
 		if self.fever>=MAX_FEVER then
 			self.fever=MAX_FEVER
+			timer.cancel(self.time_save_routine)
+			timer.cancel(self.bgm_timer)
+			sound.pause(self.current_music,true)
+			sound.play("#fever_bgm")
 			msg.post(".", "fever_time")
 		end
 		msg.post(INGAME_UI, "update_fever",{value=self.fever})

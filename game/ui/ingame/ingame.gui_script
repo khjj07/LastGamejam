@@ -2,6 +2,8 @@ local DefUI= require "DefUtil.DefUI.DefUI"
 local UI = require "game.ui.ingame.ingame"
 local MAX = 20
 local MAX_SIZE=400
+
+
 function update_life(self,life)
 	print(life)
 	if life>0 then
@@ -27,11 +29,16 @@ function update_fever(self,value)
 	self.box_node["fever_gague"]:set_size(size)
 	self.box_node["fever_gague"]:set_position(pos)
 end
+
+
 function init(self)
+	math.randomseed(os.time())
 	DefUI.init(self)
 	UI.init(self)
 	update_fever(self,0)
 end
+
+
 function on_message(self, message_id, message, sender)
 	if message_id==hash("update_life") then
 		update_life(self,message.life)

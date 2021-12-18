@@ -61,6 +61,7 @@ local function match(board, block, horisontal_neighbors, vertical_neighbors)
 		msg.post(MANAGER,"match",{tag=nil,damage=40})
 		msg.post(MANAGER,"add_fever",{value=5})
 	end
+	sound.play("#match")
 end
 
 local function create_block(position, type, color)
