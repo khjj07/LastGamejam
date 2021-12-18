@@ -15,7 +15,7 @@ components {
 }
 components {
   id: "match"
-  component: "/game/board/match.particlefx"
+  component: "/game/board/match_red.particlefx"
   position {
     x: 0.0
     y: 0.0

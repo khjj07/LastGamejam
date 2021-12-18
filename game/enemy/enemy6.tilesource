@@ -1,0 +1,28 @@
+image: "/assets/Character/Medieval King Pack 2/Sprites/king.png"
+tile_width: 160
+tile_height: 111
+tile_margin: 0
+tile_spacing: 0
+collision: ""
+material_tag: "tile"
+animations {
+  id: "idle"
+  start_tile: 9
+  end_tile: 16
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 10
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+animations {
+  id: "walk"
+  start_tile: 1
+  end_tile: 8
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+  flip_horizontal: 0
+  flip_vertical: 0
+}
+extrude_borders: 2
+inner_padding: 0
+sprite_trim_mode: SPRITE_TRIM_MODE_OFF

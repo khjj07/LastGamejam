@@ -8,7 +8,10 @@ local boardheight = 10		-- Number of rows
 local colors = {
 	hash("Icon_Shield"),
 	hash("Icon_Staff"),
-	hash("Icon_Sword")
+	hash("Icon_Sword"),
+	hash("Icon_Monster"),
+	hash("Icon_Skeleton"),
+	hash("Icon_Human")
 }
 
 --[[local color_lookup = {
@@ -84,7 +87,7 @@ end
 function init(self)
 	--local ease = { 0, 1, 0.8, 0.75, 0.8, 0.9, 1,1, 0.9,1, 1,1,1, 1,1 }
 	--local my_easing = vmath.vector(ease)
-	self.board = emthree.create_board(boardwidth, boardheight, blocksize, { direction = emthree.COLLAPSE_DOWN,remove_duration =2,swap_duration=0.2,collapse_duration=0.3, collapse_easing=go.EASING_LINEAR})
+	self.board = emthree.create_board(boardwidth, boardheight, blocksize, { direction = emthree.COLLAPSE_DOWN,slide_duration =2,swap_duration=0.2, collapse_duration=0.45, collapse_easing=go.EASING_LINEAR})
 	emthree.on_create_block(self.board, create_block)
 	--emthree.on_create_spawner(self.board, create_spawner)
 	emthree.on_create_blocker(self.board, create_blocker)

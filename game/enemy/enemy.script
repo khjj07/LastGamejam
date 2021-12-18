@@ -1,0 +1,190 @@
+local Layering = require "game.module.layering"
+local STATE ={
+	returning=hash("returning"),
+	coming=hash("coming"),
+	patrol=hash("patrol"),
+	waiting=hash("waiting")
+}
+local ANIMATION ={
+	idle=hash("idle"),
+	walk=hash("walk"),
+}
+local HP_STATE={
+	MAX=hash("max"),
+	MIDDLE=hash("middle"),
+	LOW=hash("low")
+}
+local MIN_WAITING=1
+local MAX_WAITING=6
+local RAY_DISTANCE=30
+local START_LINE=-400
+
+go.property("seed", 1)
+go.property("speed", 50)
+go.property("hp", 5)
+go.property("hp_decrease_delay", 1)
+go.property("maxhp", 10)
+go.property("initial_direction", vmath.vector3(1,0,0))
+go.property("direction", vmath.vector3(1,0,0))
+go.property("type", 1)
+go.property("tag1", hash(""))
+go.property("tag2", hash(""))
+go.property("tag3", hash(""))
+go.property("fliped_sprite", false)
+go.property("custom_scale", vmath.vector3(1,1,1))
+
+
+local function draw_line(from, to)
+	msg.post("@render:", "draw_line", { start_point = from, end_point = to, color = vmath.vector4(1,0,0,1) })
+end
+
+local function check_forward(self)
+	--print(self.direction)
+	local from =go.get_position()
+	local to =go.get_position()+self.direction*RAY_DISTANCE
+	local result = physics.raycast(from, to, {hash("obstacle")})
+	if result then
+		draw_line(from, result.position) -- <5>
+	else
+		draw_line(from, to) -- <6>
+	end
+	return result
+end
+function update_hp(self)
+	go.set("#hp", "scale.x", self.hp/self.maxhp)
+end
+
+local function check_start_line(self)
+	if go.get_position().x>START_LINE then
+		self.state=STATE.waiting
+		timer.delay(self.hp_decrease_delay, true, function()
+			check_state(self)
+			if self.state == STATE.patrol or self.state == STATE.wait then
+				self.hp=self.hp-1
+				update_hp(self)
+			end
+			--print(self.hp)
+		end)
+		state_timer(self)
+		timer.cancel(self.start_handler)
+	end	
+end
+
+function coming(self)
+	self.vel = self.speed*self.initial_direction
+end
+
+function returning(self)
+	self.vel = self.speed*-self.initial_direction
+end
+
+function patrol(self)
+	local result = check_forward(self)
+	if result  then
+		self.direction.y=-self.direction.y
+		self.direction.x=-self.direction.x
+	end
+	self.vel = self.speed*self.direction
+end
+
+function check_state(self)
+	if self.hp/self.maxhp==1 then
+		self.state = STATE.returning
+	elseif self.hp/self.maxhp==0 then
+		self.state = STATE.coming
+	end
+end
+
+function flip_animation(self)
+	
+	if self.fliped_sprite then
+		msg.post(self.sprite, "disable")
+		if self.vel.x>0 then
+			self.sprite="#sprite"
+		elseif self.vel.x<0 then
+			self.sprite="#flip_sprite"
+		end
+		msg.post(self.sprite, "enable")
+	end
+	
+	if self.vel.x>0 then
+		sprite.set_hflip(self.sprite,false)
+	elseif self.vel.x<0 then
+		sprite.set_hflip(self.sprite,true)
+	end
+	
+	if self.current_animation == ANIMATION.idle and vmath.length(self.vel) > 10 then
+		self.current_animation=ANIMATION.walk
+		msg.post(self.sprite, "play_animation",{id=self.current_animation})
+	elseif self.current_animation == ANIMATION.walk and vmath.length(self.vel) <= 10  then
+		self.current_animation=ANIMATION.idle
+		msg.post(self.sprite, "play_animation",{id=self.current_animation})
+	end
+	
+end
+
+function init(self)
+	math.randomseed(os.time()*self.seed)
+	self.state=STATE.coming
+	self.vel=vmath.vector3()
+	self.tag={self.tag1,self.tag2,self.tag3}
+	self.current_animation=hash("idle")
+	self.sprite="#sprite"
+	if self.fliped_sprite then
+		msg.post("#flip_sprite", "disable")
+	end
+	self.start_handler=timer.delay(0.1, true, function()
+		check_start_line(self)
+	end)
+	go.set_scale(self.custom_scale)
+	update_hp(self)
+end
+
+function state_timer(self)
+	self.state_timer = timer.delay(math.random(MIN_WAITING,MAX_WAITING),true, function()
+		if self.state==STATE.waiting then
+			self.state=STATE.patrol
+			local direction =vmath.vector3(math.floor(math.random(-100,100)),math.floor(math.random(-100,100)),0)
+			--print(direction)
+			self.direction=vmath.normalize(direction)
+		elseif self.state==STATE.patrol then
+			self.state=STATE.waiting
+			self.direction=vmath.vector3()
+		end
+		msg.post(".","recall_state_timer")
+	end)
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id==hash("recall_state_timer") then
+		timer.cancel(self.state_timer)
+		state_timer(self)
+	end
+end
+
+function update(self,dt)
+	Layering.update(self, dt)
+	flip_animation(self)
+	if self.state == STATE.coming then
+		coming(self)
+	elseif self.state == STATE.returning then
+		returning(self)
+	else
+		patrol(self)
+	end
+	--if not self.state == STATE.waiting then
+		local pos = go.get_position()+self.vel*dt
+		go.set_position(pos)
+	--end
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id==hash("match") then
+		for i=1,#self.tag do
+			if self.tag[i]==message.tag then
+				self.hp=self.hp+message.damage
+				break
+			end
+		end
+	end
+end

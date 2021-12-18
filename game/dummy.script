@@ -1,0 +1,11 @@
+go.property("vel", vmath.vector3(50,0,0))
+function init(self)
+	self.start=os.clock()
+end
+function update(self,dt)
+	local pos =go.get_position()+self.vel*dt
+	go.set_position(pos)
+	if go.get_position().x>300 then
+		print(os.clock()-self.start)
+	end
+end
