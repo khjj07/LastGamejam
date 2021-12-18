@@ -22,13 +22,11 @@ local MANAGER=msg.url("default:/manager")
 
 go.property("seed", 1)
 go.property("speed", 50)
-go.property("hp", 5)
 go.property("hp_decrease_delay", 0.1)
 go.property("maxhp", 10)
 go.property("initial_direction", vmath.vector3(1,0,0))
 go.property("initial_pos", vmath.vector3())
 go.property("direction", vmath.vector3(0,0,0))
-go.property("type", 1)
 go.property("tag1", hash(""))
 go.property("tag2", hash(""))
 go.property("tag3", hash(""))
@@ -137,6 +135,7 @@ function init(self)
 	self.sprite="#sprite"
 	self.come=false
 	self.returning=false
+	self.hp=self.maxhp/2
 	if self.fliped_sprite then
 		msg.post("#flip_sprite", "disable")
 	end

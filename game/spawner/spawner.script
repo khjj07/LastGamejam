@@ -1,13 +1,48 @@
 local rendercam=require "rendercam.rendercam"
 go.property("decrease_delay", 120)
 go.property("spawn_delay", 5)
+go.property("monster_maxhp", 30)
+go.property("monster_speed", 25)
+go.property("skeleton_maxhp", 20)
+go.property("skeleton_speed", 75)
+go.property("human_maxhp", 30)
+go.property("human_speed", 50)
 
-
+local TYPE={
+	human={5,6,7,8,9,13},
+	monster={1,2,3,4},
+	skeleton={10,11,12,14}
+}
+function generate_enemy(self)
+	local num = math.random(1,14)
+	local type
+	local maxhp
+	local speed
+	for k, v in pairs(TYPE) do
+		for k2, v2 in pairs(v) do
+			if v2==num then
+				type=k
+				break
+			end
+		end
+	end
+	if type == "human" then
+		maxhp=self.human_maxhp
+		speed=self.human_speed
+	elseif type == "monster" then
+		maxhp=self.monster_maxhp
+		speed=self.monster_speed
+	elseif type == "skeleton" then
+		maxhp=self.skeleton_maxhp
+		speed=self.skeleton_speed
+	end
+	factory.create("#enemy"..tostring(num),go.get_position(),nil,{maxhp=maxhp,speed=speed,seed=math.random(1,1000),initial_pos=vmath.vector3(math.random(-550,-400),math.random(-200,150),0)})
+end
 function init(self)
 	math.randomseed(os.time())
-	factory.create("#enemy"..tostring(math.random(1,14)),go.get_position(),nil,{type=self.current_type,seed=math.random(1,1000),initial_pos=vmath.vector3(math.random(-550,-400),math.random(-200,150),0)})
+	generate_enemy(self)
 	self.spawn_handler = timer.delay(self.spawn_delay, true, function()
-		factory.create("#enemy"..tostring(math.random(1,14)),go.get_position(),nil,{type=self.current_type,seed=math.random(1,1000),initial_pos=vmath.vector3(math.random(-550,-400),math.random(-200,150),0)})
+		generate_enemy(self)
 	end)
 	timer.delay(self.decrease_delay, true, function()
 		if self.spawn_delay>1 then
@@ -21,7 +56,7 @@ function on_message(self, message_id, message, sender)
 	if message_id==hash("recall_spawn_timer") then
 		timer.cancel(self.spawn_handler)
 		self.spawn_handler = timer.delay(self.spawn_delay, true, function()
-			factory.create("#enemy"..tostring(math.random(1,14)),go.get_position(),nil,{type=self.current_type,seed=math.random(1,1000),initial_pos=vmath.vector3(math.random(-550,-400),math.random(-200,150),0)})
+			generate_enemy(self)
 		end)
 	end
 end

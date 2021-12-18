@@ -13,11 +13,6 @@ components {
     w: 1.0
   }
   properties {
-    id: "hp"
-    value: "30.0"
-    type: PROPERTY_TYPE_NUMBER
-  }
-  properties {
     id: "maxhp"
     value: "60.0"
     type: PROPERTY_TYPE_NUMBER
