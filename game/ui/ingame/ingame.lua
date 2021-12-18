@@ -9,5 +9,7 @@ function G.init(self)
 	self.box_node["life1"]=box_node.create(gui.get_node("life1"))
 	self.text_node["party"]=text_node.create(gui.get_node("party"))
 	self.text_node["fever_text"]=text_node.create(gui.get_node("fever_text"))
+	self.box_node["fever_background"]=box_node.create(gui.get_node("fever_background"))
+	self.box_node["fever_gague"]=box_node.create(gui.get_node("fever_gague"))
 end
 return G

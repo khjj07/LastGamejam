@@ -82,7 +82,7 @@ embedded_components {
   id: "hp_back"
   type: "sprite"
   data: "tile_set: \"/game/enemy/hp.atlas\"\n"
-  "default_animation: \"UI_FeverGauge_Background\"\n"
+  "default_animation: \"UI_Hp_Background\"\n"
   "material: \"/builtins/materials/sprite.material\"\n"
   "blend_mode: BLEND_MODE_ALPHA\n"
   ""

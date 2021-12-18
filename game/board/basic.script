@@ -53,10 +53,13 @@ local function match(board, block, horisontal_neighbors, vertical_neighbors)
 	end
 	if #vertical_neighbors+ #horisontal_neighbors == 2 then
 		msg.post(MANAGER,"match",{tag=block.type,damage=10})
+		msg.post(MANAGER,"add_fever",{value=0.5})
 	elseif #vertical_neighbors+ #horisontal_neighbors == 3 then
 		msg.post(MANAGER,"match",{tag=block.type,damage=15})
+		msg.post(MANAGER,"add_fever",{value=2})
 	elseif #vertical_neighbors+ #horisontal_neighbors >= 4 then
 		msg.post(MANAGER,"match",{tag=nil,damage=40})
+		msg.post(MANAGER,"add_fever",{value=5})
 	end
 end
 
@@ -88,6 +91,7 @@ end
 function init(self)
 	--local ease = { 0, 1, 0.8, 0.75, 0.8, 0.9, 1,1, 0.9,1, 1,1,1, 1,1 }
 	--local my_easing = vmath.vector(ease)
+	math.randomseed(os.time())
 	self.board = emthree.create_board(boardwidth, boardheight, blocksize, { direction = emthree.COLLAPSE_DOWN,slide_duration =2,swap_duration=0.2, collapse_duration=0.45, collapse_easing=go.EASING_LINEAR})
 	emthree.on_create_block(self.board, create_block)
 	--emthree.on_create_spawner(self.board, create_spawner)
@@ -112,8 +116,11 @@ function init(self)
 		msg.post(".", "acquire_input_focus")
 	end)
 end
-
-
+function on_message(self, message_id, message, sender)
+	if message_id==hash("fever") then
+		self.fever=message.value
+	end
+end
 --[[function update(self, dt)
 	for x=0,boardwidth-1 do
 		for y=0,boardheight-1 do

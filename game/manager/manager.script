@@ -1,16 +1,48 @@
 local INGAME_UI = "default:/ingame"
+local MAX_FEVER = 20
+local FEVER_TIME = 10
 function init(self)
 	self.coming_enemy={}
 	self.life=3
+	self.fever=0
 	print(msg.url())
 end
 
+function update(self,dt)
+	
+end
 function on_message(self, message_id, message, sender)
 	if message_id==hash("match") then
+		if self.fever_time then
+			message.tag=nil
+		end
 		for k, enemy in pairs(self.coming_enemy) do
 			msg.post(enemy,"match",{tag=message.tag,damage=message.damage})
 		end
 		print(message.tag)
+	end
+	if message_id==hash("fever_end") then
+		timer.cancel(self.fever_time)
+		self.fever_time=nil
+	end
+	if message_id==hash("fever_time") then
+		self.fever_time=timer.delay(0.1, true, function()
+			local offset = MAX_FEVER/(FEVER_TIME/0.1)
+			self.fever=self.fever-offset
+			if self.fever<=0 then
+				self.fever=0
+				msg.post(".", "fever_end")
+			end
+			msg.post(INGAME_UI, "update_fever",{value=self.fever})
+		end)
+	end	
+	if message_id==hash("add_fever") and not self.fever_time then
+		self.fever=self.fever+message.value
+		if self.fever>=MAX_FEVER then
+			self.fever=MAX_FEVER
+			msg.post(".", "fever_time")
+		end
+		msg.post(INGAME_UI, "update_fever",{value=self.fever})
 	end
 	if message_id==hash("hit") then
 		self.life=self.life-1

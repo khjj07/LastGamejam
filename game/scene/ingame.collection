@@ -38,7 +38,7 @@ instances {
   position {
     x: 320.0
     y: -300.0
-    z: 0.0
+    z: 0.5
   }
   rotation {
     x: 0.0
@@ -57,7 +57,7 @@ instances {
   prototype: "/game/spawner/spawner.go"
   position {
     x: -560.0
-    y: 293.0
+    y: 240.0
     z: 0.0
   }
   rotation {
@@ -158,7 +158,7 @@ instances {
   position {
     x: 525.0
     y: 25.0
-    z: -0.1
+    z: 0.3
   }
   rotation {
     x: 0.0

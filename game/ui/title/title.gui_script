@@ -5,11 +5,13 @@ local PROXY = msg.url("main:/scene_proxy")
 function start(self)
 	msg.post(PROXY, "change_scene",{next="#ingame"})
 	print(1)
+	sound.stop("#title_bgm")
 end
 
 function init(self)
 	DefUI.init(self)
 	UI.init(self)
+	sound.play("#title_bgm")
 	DefUI.create_button(self, "start", self.box_node["start_btn"], {pressed = start})
 	msg.post(".", "acquire_input_focus")
 end

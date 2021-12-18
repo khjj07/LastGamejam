@@ -3,11 +3,11 @@ images {
   sprite_trim_mode: SPRITE_TRIM_MODE_OFF
 }
 images {
-  image: "/assets/UI/UI_FeverGauge_Fill.png"
+  image: "/assets/UI/UI_FeverGauge_Background.png"
   sprite_trim_mode: SPRITE_TRIM_MODE_OFF
 }
 images {
-  image: "/assets/UI/UI_FeverGauge_Background.png"
+  image: "/assets/UI/UI_FeverGauge_Fill.png"
   sprite_trim_mode: SPRITE_TRIM_MODE_OFF
 }
 margin: 0
