@@ -24,3 +24,6 @@ max_particlefx_count = 128
 [particle_fx]
 max_count = 128
 
+[sprite]
+max_count = 3000
+
