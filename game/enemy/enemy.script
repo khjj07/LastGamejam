@@ -3,7 +3,8 @@ local STATE ={
 	returning=hash("returning"),
 	coming=hash("coming"),
 	patrol=hash("patrol"),
-	waiting=hash("waiting")
+	waiting=hash("waiting"),
+	initial=hash("initial")
 }
 local ANIMATION ={
 	idle=hash("idle"),
@@ -25,7 +26,8 @@ go.property("hp", 5)
 go.property("hp_decrease_delay", 0.1)
 go.property("maxhp", 10)
 go.property("initial_direction", vmath.vector3(1,0,0))
-go.property("direction", vmath.vector3(1,0,0))
+go.property("initial_pos", vmath.vector3())
+go.property("direction", vmath.vector3(0,0,0))
 go.property("type", 1)
 go.property("tag1", hash(""))
 go.property("tag2", hash(""))
@@ -129,8 +131,7 @@ end
 
 function init(self)
 	math.randomseed(os.time()*self.seed)
-	self.state=STATE.coming
-	self.vel=vmath.vector3()
+	self.state=STATE.initial
 	self.tag={self.tag1,self.tag2,self.tag3}
 	self.current_animation=ANIMATION.idle
 	self.sprite="#sprite"
@@ -141,6 +142,10 @@ function init(self)
 	end
 	go.set_scale(self.custom_scale)
 	update_hp(self)
+	go.set(self.sprite, "tint", vmath.vector4(0,0,0,0))
+	go.animate(self.sprite, "tint", go.PLAYBACK_ONCE_FORWARD, vmath.vector4(1,1,1,1), go.EASING_LINEAR, 1)
+	self.direction=vmath.normalize(self.initial_pos-go.get_position())
+	self.vel=self.direction*self.speed
 end
 
 function state_timer(self)
@@ -163,29 +168,29 @@ function on_message(self, message_id, message, sender)
 		timer.cancel(self.state_timer)
 		state_timer(self)
 	end
+	if message_id==hash("dead_response") then
+		go.animate(self.sprite, "tint", go.PLAYBACK_ONCE_FORWARD, vmath.vector4(0,0,0,0), go.EASING_LINEAR, 1)
+		timer.delay(1, false, function()
+			go.delete()
+		end)
+	end
 	if message_id==hash("trigger_response") then
 		if message.other_group == hash("deadline") and message.enter then
 			msg.post(MANAGER, "dead",{id=go.get_id()})
-		end
-		if message.other_group == hash("startline") and not message.enter then
-			self.state=STATE.waiting
-			timer.delay(self.hp_decrease_delay, true, function()
-				check_state(self)
-				if self.state == STATE.patrol or self.state == STATE.waiting then
-					self.hp=self.hp-0.3
-					update_hp(self)
-				end
-				--print(self.hp)
-			end)
-			state_timer(self)
+			msg.post("#collisionobject", "disable")
 		end
 	end
 	if message_id==hash("match") then
 		for i=1,#self.tag do
-			if self.tag[i]==message.tag then
-				print("match : "..tostring(message.tag))
+			if not message.tag then
 				self.hp=self.hp+message.damage
-				print(self.hp)
+				if self.hp>=self.maxhp then
+					self.hp=self.maxhp
+				end
+				update_hp(self)
+				break
+			elseif self.tag[i]==message.tag then
+				self.hp=self.hp+message.damage
 				if self.hp>=self.maxhp then
 					self.hp=self.maxhp
 				end
@@ -202,9 +207,22 @@ function update(self,dt)
 		coming(self)
 	elseif self.state == STATE.returning then
 		returning(self)
+	elseif self.state == STATE.initial and vmath.length(go.get_position()-self.initial_pos)<10 then
+		self.state=STATE.waiting
+		self.direction = vmath.vector3()
+		state_timer(self)
+		timer.delay(self.hp_decrease_delay, true, function()
+			check_state(self)
+			if self.state == STATE.patrol or self.state == STATE.waiting then
+				self.hp=self.hp-0.3
+				update_hp(self)
+			end
+			--print(self.hp)
+		end)
 	else
 		patrol(self)
 	end
+	
 	local pos = go.get_position()+self.vel*dt
 	go.set_position(pos)
 	flip_animation(self)

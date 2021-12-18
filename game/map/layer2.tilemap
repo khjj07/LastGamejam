@@ -1,7 +1,7 @@
 tile_set: "/game/map/layer2.tilesource"
 layers {
   id: "layer1"
-  z: 0.3
+  z: 0.1
   is_visible: 1
   cell {
     x: 7

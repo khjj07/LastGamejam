@@ -1,25 +1,28 @@
+local DefUI= require "DefUtil.DefUI.DefUI"
+local UI = require "game.ui.ingame.ingame"
+
+function update_life(self,life)
+	print(life)
+	if life>0 then
+		for i = 1, life do
+			self.box_node["life"..tostring(i)]:show()
+		end
+	end
+	if life<3 and life>-1 then
+		for i = life+1, 3 do
+			self.box_node["life"..tostring(i)]:hide()
+		end
+	end
+end
+
 function init(self)
-	-- Add initialization code here
-	-- Learn more: https://defold.com/manuals/script/
-	-- Remove this function if not needed
+	DefUI.init(self)
+	UI.init(self)
 end
-
-function final(self)
-	-- Add finalization code here
-	-- Learn more: https://defold.com/manuals/script/
-	-- Remove this function if not needed
-end
-
-function update(self, dt)
-	-- Add update code here
-	-- Learn more: https://defold.com/manuals/script/
-	-- Remove this function if not needed
-end
-
 function on_message(self, message_id, message, sender)
-	-- Add message-handling code here
-	-- Learn more: https://defold.com/manuals/message-passing/
-	-- Remove this function if not needed
+	if message_id==hash("update_life") then
+		update_life(self,message.life)
+	end
 end
 
 function on_input(self, action_id, action)

@@ -1,5 +1,7 @@
+local INGAME_UI = "default:/ingame"
 function init(self)
 	self.coming_enemy={}
+	self.life=3
 	print(msg.url())
 end
 
@@ -10,13 +12,20 @@ function on_message(self, message_id, message, sender)
 		end
 		print(message.tag)
 	end
+	if message_id==hash("hit") then
+		self.life=self.life-1
+		msg.post(INGAME_UI, "update_life",{life=self.life})
+	end	
 	if message_id==hash("dead") then
 		for k, enemy in pairs(self.coming_enemy) do
 			if enemy == message.id then
 				table.remove(self.coming_enemy,k)
+				msg.post(message.id, "dead_response")
+				msg.post(".", "hit")
+				break
 			end
 		end
-		go.delete(message.id)
+		
 	end	
 	if message_id==hash("come") then
 		table.insert(self.coming_enemy, message.id)

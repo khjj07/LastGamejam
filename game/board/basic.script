@@ -3,7 +3,7 @@ local effects = require "emthree.effects"
 local rendercam = require "rendercam.rendercam"
 local blocksize = 50		-- Distance between block centers
 local boardwidth = 6		-- Number of columns
-local boardheight = 10		-- Number of rows
+local boardheight = 12		-- Number of rows
 local MANAGER=msg.url("default:/manager")
 local TAG ={
 	hash("shield"),
@@ -56,7 +56,7 @@ local function match(board, block, horisontal_neighbors, vertical_neighbors)
 	elseif #vertical_neighbors+ #horisontal_neighbors == 3 then
 		msg.post(MANAGER,"match",{tag=block.type,damage=15})
 	elseif #vertical_neighbors+ #horisontal_neighbors >= 4 then
-		msg.post(MANAGER,"match",{tag=block.type,damage=40})
+		msg.post(MANAGER,"match",{tag=nil,damage=40})
 	end
 end
 
