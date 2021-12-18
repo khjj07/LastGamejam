@@ -1,5 +1,5 @@
 local DefUI= require "DefUtil.DefUI.DefUI"
-local UI = require "game.ui.title"
+local UI = require "game.ui.title.title"
 local PROXY = msg.url("main:/scene_proxy")
 
 function start(self)

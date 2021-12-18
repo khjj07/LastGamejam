@@ -1,6 +1,6 @@
 components {
-  id: "title"
-  component: "/game/ui/title.gui"
+  id: "ingame"
+  component: "/game/ui/ingame/ingame.gui"
   position {
     x: 0.0
     y: 0.0
