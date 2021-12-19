@@ -129,7 +129,7 @@ nodes {
   clipping_mode: CLIPPING_MODE_NONE
   clipping_visible: true
   clipping_inverted: false
-  alpha: 0.4
+  alpha: 0.48
   template_node_child: false
   size_mode: SIZE_MODE_MANUAL
 }
@@ -486,7 +486,7 @@ nodes {
   clipping_mode: CLIPPING_MODE_NONE
   clipping_visible: true
   clipping_inverted: false
-  alpha: 1.0
+  alpha: 0.83
   template_node_child: false
   size_mode: SIZE_MODE_MANUAL
 }
@@ -545,7 +545,7 @@ nodes {
   line_break: false
   parent: "developers"
   layer: ""
-  inherit_alpha: true
+  inherit_alpha: false
   alpha: 1.0
   outline_alpha: 1.0
   shadow_alpha: 1.0
@@ -608,7 +608,7 @@ nodes {
   line_break: false
   parent: "developers"
   layer: ""
-  inherit_alpha: true
+  inherit_alpha: false
   alpha: 1.0
   outline_alpha: 1.0
   shadow_alpha: 1.0
@@ -671,7 +671,7 @@ nodes {
   line_break: false
   parent: "developers"
   layer: ""
-  inherit_alpha: true
+  inherit_alpha: false
   alpha: 1.0
   outline_alpha: 1.0
   shadow_alpha: 1.0
