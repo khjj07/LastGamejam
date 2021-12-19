@@ -15,6 +15,30 @@ local HP_COLOR={
 	ORANGE=vmath.vector4(1,0.7,0,1),
 	GREEN=vmath.vector4(0,1,0,1)
 }
+local DIALOG={
+	"어디 한번 재밌게 놀아볼까",
+	"아 게임잼 끝나니까 \n너무 피곤하네 ",
+	"오늘도 신나게 놀아볼까요",
+	"이제 게임잼도 끝났는데 \n뭐하고 놀지",
+	"포포가 여기 있다던데",
+	"페퍼야 놀자~",
+	"술이나 먹자",
+	"오 취향저격~",
+	"꺼억~ 배부르다",
+	"헬스는 언제하지",
+	"역시 스토브파티보다 재밌네",
+	"뭐지? 누가 자꾸 집에 \n못가게 하지",
+	"모쏠 만세!",
+	"크리스마스에는 \n혼자보내야지",
+	"오늘은 새벽까지 달린다",
+	"역시 집에 가긴 아쉬워",
+	"계속 놀아보자고",
+	"아 택시 불렀는데",
+	"지갑 놓고 왔네",
+	"핸드폰 놓고 왔네",
+	"뚜씨 뚜씨 뚜씨~"
+}
+
 local MIN_WAITING=1
 local MAX_WAITING=6
 local RAY_DISTANCE=30
@@ -32,6 +56,11 @@ go.property("tag2", hash(""))
 go.property("tag3", hash(""))
 go.property("fliped_sprite", false)
 go.property("custom_scale", vmath.vector3(1,1,1))
+
+function speak(list)
+	local speech=factory.create("#speech",go.get_position()+vmath.vector3(0,30,0),nil)
+	msg.post(speech, "text",{text=list[math.random(#list)],sender=go.get_id()})
+end
 
 local function draw_line(from, to)
 	msg.post("@render:", "draw_line", { start_point = from, end_point = to, color = vmath.vector4(1,0,0,1) })
@@ -83,6 +112,7 @@ function check_state(self)
 		self.state = STATE.returning
 		if not self.returning then
 			msg.post(MANAGER, "return",{id=go.get_id()})
+			speak(DIALOG)
 			self.current_animation=ANIMATION.idle
 			self.returning=true
 		end
@@ -144,6 +174,9 @@ function init(self)
 	update_hp(self)
 	go.set(self.sprite, "tint", vmath.vector4(0,0,0,0))
 	go.animate(self.sprite, "tint", go.PLAYBACK_ONCE_FORWARD, vmath.vector4(1,1,1,1), go.EASING_LINEAR, 1)
+	timer.delay(1, false, function()
+		speak(DIALOG)
+	end)
 	self.direction=vmath.normalize(self.initial_pos-go.get_position())
 	self.vel=self.direction*self.speed
 	go.set("#shadow", "tint", vmath.vector4(0,0,0,0.4))
@@ -170,6 +203,7 @@ function on_message(self, message_id, message, sender)
 		state_timer(self)
 	end
 	if message_id==hash("dead_response") then
+		
 		go.animate(self.sprite, "tint", go.PLAYBACK_ONCE_FORWARD, vmath.vector4(0,0,0,0), go.EASING_LINEAR, 1)
 		timer.delay(1, false, function()
 			go.delete()
@@ -193,6 +227,7 @@ function on_message(self, message_id, message, sender)
 					self.hp=self.maxhp
 				end
 				update_hp(self)
+				speak(DIALOG)
 				break
 			elseif self.tag[i]==message.tag then
 				factory.create("#effect",go.get_position(),nil,{tag=message.tag})
@@ -202,6 +237,7 @@ function on_message(self, message_id, message, sender)
 				end
 				go.animate(".", "scale", go.PLAYBACK_ONCE_PINGPONG, go.get_scale()+vmath.vector3(0.5,0.5,0), go.EASING_INOUTBOUNCE, 0.2)
 				update_hp(self)
+				speak(DIALOG)
 				break
 			end
 		end

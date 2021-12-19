@@ -90,10 +90,10 @@ function on_message(self, message_id, message, sender)
 		self.box_node["filter"]:hide()
 	end
 	if message_id==hash("alert") then
-		self.box_node["alert"]:animate("position.x",960,gui.EASING_INCIRC,1,0,function()
+		self.box_node["alert"]:animate("position.x",960,gui.EASING_INCUBIC,1.5,0,function()
 			self.alert:print(message.text)
 			timer.delay(3, false, function()
-				self.box_node["alert"]:animate("position.x",1920+960,gui.EASING_INCIRC,1,0,function()
+				self.box_node["alert"]:animate("position.x",1920+960,gui.EASING_OUTCUBIC,1.5,0,function()
 					self.box_node["alert"]:set_position(vmath.vector3(-960,540,0))
 				end)
 			end)

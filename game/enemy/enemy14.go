@@ -220,3 +220,21 @@ embedded_components {
     w: 1.0
   }
 }
+embedded_components {
+  id: "speech"
+  type: "factory"
+  data: "prototype: \"/game/enemy/bubble/speech_bubble.go\"\n"
+  "load_dynamically: false\n"
+  ""
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+}

@@ -1,0 +1,15 @@
+function init(self)
+	go.set_scale(vmath.vector3(0.2,0.2,1))
+	
+	timer.delay(2, false, function()
+		go.delete()
+	end)
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id==hash("text") then
+		label.set_text("#label", message.text)
+		go.set_parent(".",sender,true)
+		go.set_position(go.get_position()+vmath.vector3(60,70,0))
+	end
+end

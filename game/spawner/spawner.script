@@ -48,7 +48,7 @@ function init(self)
 	timer.delay(self.decrease_delay, true, function()
 		if self.spawn_delay>1 then
 			self.spawn_delay=self.spawn_delay-1
-			msg.post(INGAME_UI, "alert",{text="{alert1}           손님들이 미쳐 날뛰고 있습니다!{/}                     {alert2}(손님들이 더 빠르게 입장합니다.){/}"})
+			msg.post(INGAME_UI, "alert",{text="{alert1}           손님들이 미쳐 날뛰고 있습니다!{/}                     {alert2}(  손님들이 더 빠르게 입장합니다){/}"})
 			msg.post(".", "recall_spawn_timer")
 		end
 	end)
