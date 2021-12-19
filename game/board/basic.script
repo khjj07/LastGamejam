@@ -54,12 +54,15 @@ local function match(board, block, horisontal_neighbors, vertical_neighbors)
 	if #vertical_neighbors+ #horisontal_neighbors == 2 then
 		msg.post(MANAGER,"match",{tag=block.type,damage=10})
 		msg.post(MANAGER,"add_fever",{value=0.5})
+		msg.post(MANAGER, "combo",{value=1})
 	elseif #vertical_neighbors+ #horisontal_neighbors == 3 then
 		msg.post(MANAGER,"match",{tag=block.type,damage=15})
 		msg.post(MANAGER,"add_fever",{value=2})
+		msg.post(MANAGER, "combo",{value=2})
 	elseif #vertical_neighbors+ #horisontal_neighbors >= 4 then
 		msg.post(MANAGER,"match",{tag=nil,damage=40})
 		msg.post(MANAGER,"add_fever",{value=5})
+		msg.post(MANAGER, "combo",{value=3})
 	end
 	sound.play("#match")
 end

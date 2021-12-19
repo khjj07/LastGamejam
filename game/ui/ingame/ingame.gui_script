@@ -54,6 +54,7 @@ function init(self)
 	self.hover=nil
 	self.alert = printer.new(self, "alert_in")
 	self.alert.add_styles(styles) 
+	self.text_node["combo"]:set_scale(vmath.vector3(0.001,0.001,1))
 end
 
 function update(self, dt)
@@ -84,10 +85,23 @@ function on_message(self, message_id, message, sender)
 	end	
 	if message_id==hash("fever") then
 		self.box_node["filter"]:show()
-		self.box_node["filter"]:animate("color",vmath.vector3(math.random(0.5,1),math.random(0.5,1),math.random(0.5,1),math.random(0.2,0.5)),gui.EASING_INOUTELASTIC,0.1)
+		self.box_node["filter"]:animate("color",vmath.vector3(math.random(0.5,1),math.random(0.5,1),math.random(0.5,1),math.random(0.01,0.05)),gui.EASING_INOUTELASTIC,0.2)
 	end
 	if message_id==hash("fever_end") then
 		self.box_node["filter"]:hide()
+	end
+	if message_id==hash("update_combo") then
+		self.text_node["combo"]:set_scale(vmath.vector3(0.001,0.001,1))
+		print(message.value)
+		--self.text_node["combo"]:set_color(vmath.vector4(math.random(0.5,1),math.random(0.5,1),math.random(0.5,1),1))
+		if message.value == 100 then
+			self.text_node["combo"]:set_text("HEALING")
+		else
+			self.text_node["combo"]:set_text("HEALCOMBO\n"..tostring(message.value))
+		end
+		self.text_node["combo"]:animate("scale",vmath.vector3(2.5,2.5,1),gui.EASING_LINEAR,0.5,0,function()
+			self.text_node["combo"]:set_scale(vmath.vector3(0.001,0.001,1))
+		end)
 	end
 	if message_id==hash("alert") then
 		self.box_node["alert"]:animate("position.x",960,gui.EASING_INCUBIC,1.5,0,function()
@@ -95,6 +109,7 @@ function on_message(self, message_id, message, sender)
 			timer.delay(3, false, function()
 				self.box_node["alert"]:animate("position.x",1920+960,gui.EASING_OUTCUBIC,1.5,0,function()
 					self.box_node["alert"]:set_position(vmath.vector3(-960,540,0))
+	
 				end)
 			end)
 		

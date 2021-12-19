@@ -21,5 +21,6 @@ function G.init(self)
 	self.box_node["alert_in/text_parent"]=box_node.create(gui.get_node("alert_in/text_parent"))
 	self.text_node["alert_in/prefab"]=text_node.create(gui.get_node("alert_in/prefab"))
 	self.box_node["alert_in/prefab_icon"]=box_node.create(gui.get_node("alert_in/prefab_icon"))
+	self.text_node["combo"]=text_node.create(gui.get_node("combo"))
 end
 return G

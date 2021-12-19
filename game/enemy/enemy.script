@@ -26,7 +26,7 @@ local DIALOG={
 	"오 취향저격~",
 	"꺼억~ 배부르다",
 	"헬스는 언제하지",
-	"역시 스토브파티보다 재밌네",
+	"역시 스토브파티보다 \n재밌네",
 	"뭐지? 누가 자꾸 집에 \n못가게 하지",
 	"모쏠 만세!",
 	"크리스마스에는 \n혼자보내야지",
@@ -227,7 +227,6 @@ function on_message(self, message_id, message, sender)
 					self.hp=self.maxhp
 				end
 				update_hp(self)
-				speak(DIALOG)
 				break
 			elseif self.tag[i]==message.tag then
 				factory.create("#effect",go.get_position(),nil,{tag=message.tag})
@@ -237,7 +236,6 @@ function on_message(self, message_id, message, sender)
 				end
 				go.animate(".", "scale", go.PLAYBACK_ONCE_PINGPONG, go.get_scale()+vmath.vector3(0.5,0.5,0), go.EASING_INOUTBOUNCE, 0.2)
 				update_hp(self)
-				speak(DIALOG)
 				break
 			end
 		end

@@ -2,6 +2,7 @@ local INGAME_UI = "default:/ingame"
 local BOARD ="default:/board"
 local MAX_FEVER = 15
 local FEVER_TIME = 15
+local INITAIL_COMBO=30
 local BGM={
 	"#ingame_bgm1",
 	"#ingame_bgm2",
@@ -41,6 +42,7 @@ end
 function init(self)
 	self.coming_enemy={}
 	self.life=3
+	self.combo=INITAIL_COMBO
 	self.fever=0
 	self.party=0
 	self.time_saver=0
@@ -106,8 +108,20 @@ function on_message(self, message_id, message, sender)
 				break
 			end
 		end
-		
 	end	
+	if message_id==hash("combo") then
+		self.combo=self.combo-message.value
+		if self.combo<=0 then
+			self.combo=INITAIL_COMBO
+			if self.life<3 then
+				self.life=self.life+1
+				sound.play("#heal")
+			end
+			msg.post(INGAME_UI, "update_life",{life=self.life})
+		end
+		msg.post(INGAME_UI, "update_combo",{value=self.combo})
+	end
+	
 	if message_id==hash("hit") then
 		self.life=self.life-1
 		if self.life==0 then
