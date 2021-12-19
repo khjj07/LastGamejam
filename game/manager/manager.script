@@ -9,13 +9,14 @@ local BGM={
 }
 local SCORE =
 {
-	{rank="F",condition=25,nickname="헬파티 매니저",comment="출근 첫날 짤림"},
-	{rank="D",condition=50,nickname="신데렐라메이커",comment="12시도 안됐는데 다 집에가네"},
-	{rank="C",condition=75,nickname="동대문지기",comment="동동 동대문을 열어라~"},
-	{rank="B",condition=100,nickname="부장님",comment="벌써 퇴근하려고?(찡긋)"},
-	{rank="A",condition=125,nickname="꽐라메이커",comment="네 발로 기어가~"},
-	{rank="S",condition=250,nickname="축제의 신",comment="너 때문에 흥이 다 깨버렸으니 책임져"}
+	{rank="F",condition=10,nickname="헬파티 매니저",comment="출근 첫날 짤림"},
+	{rank="D",condition=25,nickname="신데렐라메이커",comment="12시도 안됐는데 다 집에가네"},
+	{rank="C",condition=50,nickname="동대문지기",comment="동동 동대문을 열어라~"},
+	{rank="B",condition=75,nickname="부장님",comment="벌써 퇴근하려고?(찡긋)"},
+	{rank="A",condition=100,nickname="꽐라메이커",comment="네 발로 기어가~"},
+	{rank="S",condition=125,nickname="축제의 신",comment="너 때문에 흥이 다 깨버렸으니 책임져"}
 }
+
 local BGM_PLAY_TIME={
 	168,
 	257,
