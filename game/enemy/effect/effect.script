@@ -1,0 +1,15 @@
+go.property("tag", hash("shield"))
+local TAG ={
+	[hash("shield")]="#shield",
+	[hash("staff")]="#staff",
+	[hash("sword")]="#sword",
+	[hash("monster")]="#monster",
+	[hash("skeleton")]="#skeleton",
+	[hash("human")]="#human"
+}
+function init(self)
+	particlefx.play(TAG[self.tag])
+	timer.delay(1, false, function()
+		go.delete()
+	end)
+end

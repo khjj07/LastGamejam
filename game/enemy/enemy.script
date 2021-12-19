@@ -33,7 +33,6 @@ go.property("tag3", hash(""))
 go.property("fliped_sprite", false)
 go.property("custom_scale", vmath.vector3(1,1,1))
 
-
 local function draw_line(from, to)
 	msg.post("@render:", "draw_line", { start_point = from, end_point = to, color = vmath.vector4(1,0,0,1) })
 end
@@ -120,11 +119,13 @@ function flip_animation(self)
 	if self.current_animation == ANIMATION.idle and vmath.length(self.vel) > 10 then
 		self.current_animation=ANIMATION.walk
 		msg.post(self.sprite, "play_animation",{id=self.current_animation})
+		particlefx.play("#smoke")
+	
 	elseif self.current_animation == ANIMATION.walk and vmath.length(self.vel) <= 10  then
 		self.current_animation=ANIMATION.idle
 		msg.post(self.sprite, "play_animation",{id=self.current_animation})
+		particlefx.stop("#smoke")
 	end
-	
 end
 
 function init(self)
@@ -145,6 +146,7 @@ function init(self)
 	go.animate(self.sprite, "tint", go.PLAYBACK_ONCE_FORWARD, vmath.vector4(1,1,1,1), go.EASING_LINEAR, 1)
 	self.direction=vmath.normalize(self.initial_pos-go.get_position())
 	self.vel=self.direction*self.speed
+	go.set("#shadow", "tint", vmath.vector4(0,0,0,0.4))
 end
 
 function state_timer(self)
@@ -193,10 +195,12 @@ function on_message(self, message_id, message, sender)
 				update_hp(self)
 				break
 			elseif self.tag[i]==message.tag then
+				factory.create("#effect",go.get_position(),nil,{tag=message.tag})
 				self.hp=self.hp+message.damage
 				if self.hp>=self.maxhp then
 					self.hp=self.maxhp
 				end
+				go.animate(".", "scale", go.PLAYBACK_ONCE_PINGPONG, go.get_scale()+vmath.vector3(0.5,0.5,0), go.EASING_INOUTBOUNCE, 0.2)
 				update_hp(self)
 				break
 			end

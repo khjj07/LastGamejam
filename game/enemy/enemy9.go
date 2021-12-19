@@ -28,9 +28,29 @@ components {
     type: PROPERTY_TYPE_HASH
   }
   properties {
+    id: "fliped_sprite"
+    value: "true"
+    type: PROPERTY_TYPE_BOOLEAN
+  }
+  properties {
     id: "custom_scale"
     value: "1.5, 1.5, 1.0"
     type: PROPERTY_TYPE_VECTOR3
+  }
+}
+components {
+  id: "smoke"
+  component: "/game/enemy/smoke/smoke.particlefx"
+  position {
+    x: -8.0
+    y: 9.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
   }
 }
 embedded_components {
@@ -42,7 +62,7 @@ embedded_components {
   "blend_mode: BLEND_MODE_ALPHA\n"
   ""
   position {
-    x: 1.0
+    x: 7.0
     y: 23.0
     z: 0.0
   }
@@ -133,6 +153,64 @@ embedded_components {
   position {
     x: 0.0
     y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+}
+embedded_components {
+  id: "effect"
+  type: "factory"
+  data: "prototype: \"/game/enemy/effect/effect.go\"\n"
+  "load_dynamically: false\n"
+  ""
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+}
+embedded_components {
+  id: "shadow"
+  type: "sprite"
+  data: "tile_set: \"/game/enemy/shadow.atlas\"\n"
+  "default_animation: \"idle\"\n"
+  "material: \"/builtins/materials/sprite.material\"\n"
+  "blend_mode: BLEND_MODE_ALPHA\n"
+  ""
+  position {
+    x: -2.0
+    y: -16.0
+    z: -0.3
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+}
+embedded_components {
+  id: "flip_sprite"
+  type: "sprite"
+  data: "tile_set: \"/game/enemy/enemy9.atlas\"\n"
+  "default_animation: \"walk\"\n"
+  "material: \"/builtins/materials/sprite.material\"\n"
+  "blend_mode: BLEND_MODE_ALPHA\n"
+  ""
+  position {
+    x: -7.0
+    y: 23.0
     z: 0.0
   }
   rotation {

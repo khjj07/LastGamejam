@@ -1,10 +1,20 @@
 local INGAME_UI = "default:/ingame"
+local BOARD ="default:/board"
 local MAX_FEVER = 15
 local FEVER_TIME = 15
 local BGM={
 	"#ingame_bgm1",
 	"#ingame_bgm2",
 	"#ingame_bgm3",
+}
+local SCORE =
+{
+	{rank="F",condition=25,nickname="헬파티 매니저",comment="출근 첫날 짤림"},
+	{rank="D",condition=50,nickname="신데렐라메이커",comment="12시도 안됐는데 다 집에가네"},
+	{rank="C",condition=75,nickname="동대문지기",comment="동동 동대문을 열어라~"},
+	{rank="B",condition=100,nickname="부장님",comment="벌써 퇴근하려고?(찡긋)"},
+	{rank="A",condition=125,nickname="꽐라메이커",comment="네 발로 기어가~"},
+	{rank="S",condition=250,nickname="축제의 신",comment="너 때문에 흥이 다 깨버렸으니 책임져"}
 }
 local BGM_PLAY_TIME={
 	168,
@@ -31,13 +41,27 @@ function init(self)
 	self.coming_enemy={}
 	self.life=3
 	self.fever=0
+	self.party=0
 	self.time_saver=0
 	self.music_flag = math.random(#BGM)
 	play_next_music(self)
+	timer.delay(0.1, true, function()
+		if self.fever_time then
+			local offset = MAX_FEVER/(FEVER_TIME/0.1)
+			self.fever=self.fever-offset
+			msg.post(INGAME_UI, "fever")
+			if self.fever<=0 then
+				self.fever=0
+				msg.post(".", "fever_end")
+				msg.post(INGAME_UI, "fever_end")
+			end
+		end
+		msg.post(INGAME_UI, "update_fever",{value=self.fever})
+	end)
 end
 
 function update(self,dt)
-	
+	print(self.party)
 end
 function on_message(self, message_id, message, sender)
 	if message_id==hash("match") then
@@ -47,11 +71,10 @@ function on_message(self, message_id, message, sender)
 		for k, enemy in pairs(self.coming_enemy) do
 			msg.post(enemy,"match",{tag=message.tag,damage=message.damage})
 		end
-		print(message.tag)
+		--print(message.tag)
 	end
 	if message_id==hash("fever_end") then
-		timer.cancel(self.fever_time)
-		self.fever_time=nil
+		self.fever_time=false
 		sound.stop("#fever_bgm")
 		sound.pause(self.current_music,false)
 		self.bgm_timer=timer.delay(BGM_PLAY_TIME[self.music_flag]-self.time_saver, false, function()
@@ -59,15 +82,7 @@ function on_message(self, message_id, message, sender)
 		end)
 	end
 	if message_id==hash("fever_time") then
-		self.fever_time=timer.delay(0.1, true, function()
-			local offset = MAX_FEVER/(FEVER_TIME/0.1)
-			self.fever=self.fever-offset
-			if self.fever<=0 then
-				self.fever=0
-				msg.post(".", "fever_end")
-			end
-			msg.post(INGAME_UI, "update_fever",{value=self.fever})
-		end)
+		self.fever_time=true
 	end	
 	if message_id==hash("add_fever") and not self.fever_time then
 		self.fever=self.fever+message.value
@@ -81,8 +96,23 @@ function on_message(self, message_id, message, sender)
 		end
 		msg.post(INGAME_UI, "update_fever",{value=self.fever})
 	end
+	if message_id==hash("game_over") then
+		sound.stop(self.current_music)
+		sound.play("#gameover_bgm")
+		for i = 1, #SCORE do
+			if self.party<=SCORE[i].condition then
+				msg.post(INGAME_UI, "game_over",SCORE[i])
+				break
+			end
+		end
+		
+	end	
 	if message_id==hash("hit") then
 		self.life=self.life-1
+		if self.life==0 then
+			msg.post(".", "game_over")
+			msg.post(BOARD, "release_input_focus")
+		end
 		msg.post(INGAME_UI, "update_life",{life=self.life})
 	end	
 	if message_id==hash("dead") then
@@ -98,9 +128,19 @@ function on_message(self, message_id, message, sender)
 	end	
 	if message_id==hash("come") then
 		table.insert(self.coming_enemy, message.id)
-		print(message.id)
+		--print(message.id)
 	end	
+	if message_id==hash("add_party") then
+		self.party=self.party+1
+		msg.post(INGAME_UI, "update_party",{value=self.party})
+	end
 	if message_id==hash("return") then
-		table.insert(self.coming_enemy, message.id)
+		for k, enemy in pairs(self.coming_enemy) do
+			if enemy == message.id then
+				msg.post(".", "add_party")
+				table.remove(self.coming_enemy,k)
+				break
+			end
+		end
 	end	
 end

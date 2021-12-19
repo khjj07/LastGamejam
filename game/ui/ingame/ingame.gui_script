@@ -2,8 +2,9 @@ local DefUI= require "DefUtil.DefUI.DefUI"
 local UI = require "game.ui.ingame.ingame"
 local MAX = 15
 local MAX_SIZE=400
-
-
+local PROXY = msg.url("main:/scene_proxy")
+local printer = require "printer.printer"
+local styles = require("game.ui.styles")
 function update_life(self,life)
 	print(life)
 	if life>0 then
@@ -29,16 +30,48 @@ function update_fever(self,value)
 	self.box_node["fever_gague"]:set_size(size)
 	self.box_node["fever_gague"]:set_position(pos)
 end
+function update_party(self, value)
+	print("파티인원수 "..tostring(value).."명")
+	self.text_node["party"]:set_text("파티인원수 "..tostring(value).."명")
+end
+function retry(self,action_id,action,button)
+	msg.post(PROXY, "reload_scene",{next="#ingame"})
+end
 
+function hover(self,action_id,action,button)
+	button:set_color(vmath.vector4(1,0,0,1))
+	self.hover = button
+end
 
 function init(self)
 	math.randomseed(os.time())
 	DefUI.init(self)
 	UI.init(self)
 	update_fever(self,0)
+	self.box_node["game_over"]:hide()
+	self.box_node["filter"]:hide()
+	DefUI.create_button(self, "retry", self.text_node["retry"], {pressed = retry,hover=hover})
+	self.hover=nil
+	self.alert = printer.new(self, "alert_in")
+	self.alert.add_styles(styles) 
 end
 
+function update(self, dt)
+	self.alert:update(dt)
+end
 
+function final(self)
+	self.alert:final()
+end
+function on_input(self, action_id, action)
+	DefUI.on_input(self, action_id, action)
+	if self.hover then
+		if not self.hover:pick_node(action.x,action.y) then
+			self.hover:set_color(vmath.vector4(1,1,1,1))
+			self.hover = nil
+		end
+	end
+end
 function on_message(self, message_id, message, sender)
 	if message_id==hash("update_life") then
 		update_life(self,message.life)
@@ -46,22 +79,32 @@ function on_message(self, message_id, message, sender)
 	if message_id==hash("update_fever") then
 		update_fever(self, message.value)
 	end	
-end
-
-function on_input(self, action_id, action)
-	-- Add input-handling code here. The game object this script is attached to
-	-- must have acquired input focus:
-	--
-	--    msg.post(".", "acquire_input_focus")
-	--
-	-- All mapped input bindings will be received. Mouse and touch input will
-	-- be received regardless of where on the screen it happened.
-	-- Learn more: https://defold.com/manuals/input/
-	-- Remove this function if not needed
-end
-
-function on_reload(self)
-	-- Add reload-handling code here
-	-- Learn more: https://defold.com/manuals/hot-reload/
-	-- Remove this function if not needed
+	if message_id==hash("update_party") then
+		update_party(self, message.value)
+	end	
+	if message_id==hash("fever") then
+		self.box_node["filter"]:show()
+		self.box_node["filter"]:animate("color",vmath.vector3(math.random(0.5,1),math.random(0.5,1),math.random(0.5,1),math.random(0.2,0.5)),gui.EASING_INOUTELASTIC,0.1)
+	end
+	if message_id==hash("fever_end") then
+		self.box_node["filter"]:hide()
+	end
+	if message_id==hash("alert") then
+		self.box_node["alert"]:animate("position.x",960,gui.EASING_INCIRC,1,0,function()
+			self.alert:print(message.text)
+			timer.delay(3, false, function()
+				self.box_node["alert"]:animate("position.x",1920+960,gui.EASING_INCIRC,1,0,function()
+					self.box_node["alert"]:set_position(vmath.vector3(-960,540,0))
+				end)
+			end)
+		
+		end)
+	end	
+	if message_id==hash("game_over") then
+		msg.post(".", "acquire_input_focus")
+		self.box_node["game_over"]:show()
+		self.text_node["rank"]:set_text(message.rank)
+		self.text_node["nickname"]:set_text(message.nickname)
+		self.text_node["comment"]:set_text(message.comment)
+	end	
 end

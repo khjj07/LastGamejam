@@ -14,9 +14,11 @@ input_method = HiddenInputField
 
 [project]
 title = LastGamejam
-dependencies#0 = https://github.com/khjj07/DefUtil/archive/refs/tags/1.19.zip
+dependencies#0 = https://github.com/khjj07/DefUtil/archive/refs/tags/1.20.zip
 dependencies#1 = https://github.com/rgrams/rendercam/archive/1.0.3.zip
 dependencies#2 = https://github.com/britzl/emthree/archive/master.zip
+dependencies#3 = https://github.com/sergeysinyavsky/dsfonts/archive/master.zip
+dependencies#4 = https://github.com/Insality/defold-printer/archive/master.zip
 
 [gui]
 max_particlefx_count = 128
